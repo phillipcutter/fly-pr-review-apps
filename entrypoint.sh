@@ -37,13 +37,13 @@ fi
 
 # Deploy the Fly app, creating it first if needed.
 if ! flyctl status --app "$app"; then
-  flyctl launch --no-deploy --copy-config --name "$app" --region "$region" --org "$org"
+  flyctl launch --no-deploy --copy-config --name "$app" --region "$region" --org "$org" --auto-confirm
   if [ -n "$INPUT_SECRETS" ]; then
     echo $INPUT_SECRETS | tr " " "\n" | flyctl secrets import --app "$app"
   fi
-  flyctl deploy --app "$app" --region "$region" --region "$region" --strategy immediate
+  flyctl deploy --app "$app" --region "$region" --region "$region" --strategy immediate --auto-confirm
 elif [ "$INPUT_UPDATE" != "false" ]; then
-  flyctl deploy --config "$config" --app "$app" --region "$region" --region "$region" --strategy immediate
+  flyctl deploy --config "$config" --app "$app" --region "$region" --region "$region" --strategy immediate --auto-confirm
 fi
 
 # Attach postgres cluster to the app if specified.
