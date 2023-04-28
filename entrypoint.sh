@@ -7,11 +7,6 @@ if [ -n "$INPUT_PATH" ]; then
   cd "$INPUT_PATH" || exit
 fi
 
-ls
-cat fly.toml
-flyctl launch --no-deploy --copy-config --auto-confirm --name=pr2puddleapi --region=lax --org=personal
-cat fly.toml
-
 PR_NUMBER=$(jq -r .number /github/workflow/event.json)
 if [ -z "$PR_NUMBER" ]; then
   echo "This action only supports pull_request actions."
@@ -44,8 +39,10 @@ fi
 
 # Deploy the Fly app, creating it first if needed.
 if ! flyctl status --app "$app"; then
-  flyctl launch --no-deploy --copy-config --verbose --auto-confirm --name="$app" --region="$region" --org="$org" 
+  # flyctl launch --no-deploy --copy-config --verbose --auto-confirm --name="$app" --region="$region" --org="$org" 
+  sed -i 's/app = "puddle"/app = "'$app'"/g' fly.toml
   cat fly.toml
+  flyctl launch --no-deploy --region="$region" --org="$org" 
   if [ -n "$INPUT_SECRETS" ]; then
     echo $INPUT_SECRETS | tr " " "\n" | flyctl secrets import --app "$app"
   fi
