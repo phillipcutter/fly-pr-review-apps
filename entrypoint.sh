@@ -39,7 +39,7 @@ fi
 
 # Deploy the Fly app, creating it first if needed.
 if ! flyctl status --app "$app"; then
-  flyctl launch --no-deploy --copy-config --auto-confirm --name="$app" --region="$region" --org="$org" 
+  flyctl launch --no-deploy --copy-config --verbose --auto-confirm --name="$app" --region="$region" --org="$org" 
   cat fly.toml
   if [ -n "$INPUT_SECRETS" ]; then
     echo $INPUT_SECRETS | tr " " "\n" | flyctl secrets import --app "$app"
