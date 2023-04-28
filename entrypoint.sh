@@ -7,6 +7,9 @@ if [ -n "$INPUT_PATH" ]; then
   cd "$INPUT_PATH" || exit
 fi
 
+flyctl launch --no-deploy --copy-config --auto-confirm --name=pr2puddleapi --region=lax --org=personal
+cat fly.toml
+
 PR_NUMBER=$(jq -r .number /github/workflow/event.json)
 if [ -z "$PR_NUMBER" ]; then
   echo "This action only supports pull_request actions."
