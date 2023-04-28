@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/sh -l
 
 set -ex
 
@@ -29,8 +29,6 @@ if ! echo "$app" | grep "$PR_NUMBER"; then
   exit 1
 fi
 
-flyctl version
-
 # PR was closed - remove the Fly app if one exists and exit.
 if [ "$EVENT_TYPE" = "closed" ]; then
   flyctl apps destroy "$app" -y || true
@@ -39,16 +37,13 @@ fi
 
 # Deploy the Fly app, creating it first if needed.
 if ! flyctl status --app "$app"; then
-  # flyctl launch --no-deploy --copy-config --verbose --auto-confirm --name="$app" --region="$region" --org="$org" 
-  sed -i 's/app = "puddle"/app = "'$app'"/g' fly.toml
-  cat fly.toml
-  flyctl launch --no-deploy --region="$region" --org="$org" 
+  flyctl launch --no-deploy --copy-config --name "$app" --image "$image" --region "$region" --org "$org"
   if [ -n "$INPUT_SECRETS" ]; then
     echo $INPUT_SECRETS | tr " " "\n" | flyctl secrets import --app "$app"
   fi
-  flyctl deploy --app="$app" --region="$region" --strategy immediate --auto-confirm
+  flyctl deploy --app "$app" --region "$region" --image "$image" --region "$region" --strategy immediate
 elif [ "$INPUT_UPDATE" != "false" ]; then
-  flyctl deploy --config "$config" --app "$app" --region "$region" --region "$region" --strategy immediate --auto-confirm
+  flyctl deploy --config "$config" --app "$app" --region "$region" --image "$image" --region "$region" --strategy immediate
 fi
 
 # Attach postgres cluster to the app if specified.
